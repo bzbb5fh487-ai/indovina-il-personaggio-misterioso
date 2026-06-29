@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Cinema - 17 Personaggi</title>
+    <title>Quiz Cinema - 17 Personaggi Reali</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -49,7 +49,7 @@
             transition: filter 0.4s ease-in-out;
         }
         .blurred {
-            filter: blur(22px) contrast(1.15) brightness(0.95);
+            filter: blur(20px) contrast(1.15) brightness(0.95);
         }
         .sharp {
             filter: blur(0px) contrast(1) brightness(1);
@@ -139,23 +139,23 @@
 
 <script>
     const playlist = [
-        { solution: "alberto sordi", url: "https://i.imgur.com/GzB0u6R.png", hint: "Icona del cinema italiano, indimenticabile nei ruoli del Vigile e del Marchese del Grillo" },
-        { solution: "angelina jolie", url: "https://i.imgur.com/vHq0LzN.png", hint: "Attrice premio Oscar, volto di Lara Croft in 'Tomb Raider' e della spietata 'Maleficent'" },
-        { solution: "arnold schwarzenegger", url: "https://i.imgur.com/9nJ97oG.png", hint: "Campione di bodybuilding ed eroe d'azione... 'Hasta la vista, baby!' (Terminator)" },
-        { solution: "brad pitt", url: "https://i.imgur.com/w9Z3mXN.png", hint: "Star mondiale, protagonista in cult assoluti come 'Fight Club', 'Troy' e 'Se7en'" },
-        { solution: "johnny depp", url: "https://i.imgur.com/f0mX84e.png", hint: "Camaleontico interprete di Jack Sparrow in 'Pirati dei Caraibi' ed 'Edward mani di forbice'" },
-        { solution: "leonardo dicaprio", url: "https://i.imgur.com/V7IscR6.png", hint: "Ha raggiunto la fama mondiale con 'Titanic', vincendo l'Oscar grazie a 'The Revenant'" },
-        { solution: "gigi proietti", url: "https://i.imgur.com/9Cby8L0.png", hint: "Il mitico Mandrake in 'Febbre da cavallo' e protagonista assoluto ne 'Il maresciallo Rocca'" },
-        { solution: "marcello mastroianni", url: "https://i.imgur.com/E0X7o7b.png", hint: "Simbolo del cinema italiano e compagno di set della Loren in capolavori come 'La Dolce Vita'" },
-        { solution: "marilyn monroe", url: "https://i.imgur.com/6Dbtm5x.png", hint: "L'icona bionda più celebre del XX secolo, protagonista in 'A qualcuno piace caldo'" },
-        { solution: "monica bellucci", url: "https://i.imgur.com/N6E3yX3.png", hint: "Diva e modella dal fascino mediterraneo, interprete in 'Malèna' e nella saga di 'Matrix'" },
-        { solution: "checco zalone", url: "https://i.imgur.com/3fK9XmZ.png", hint: "Re assoluto del box office comico italiano con 'Cado dalle nubi' e 'Quo vado?'" },
-        { solution: "carlo verdone", url: "https://i.imgur.com/6Xz9bWk.png", hint: "Pilastro della commedia romana, indimenticabile nei ruoli di Furio, Mimmo e Ivano" },
-        { solution: "sophia loren", url: "https://i.imgur.com/9vB2nK8.png", hint: "Leggenda vivente del grande schermo, ha vinto il premio Oscar per 'La ciociara'" },
-        { solution: "tom cruise", url: "https://i.imgur.com/8mB7bXk.png", hint: "Spericolato pilota Maverick in 'Top Gun' ed agente segreto nella saga 'Mission: Impossible'" },
-        { solution: "will smith", url: "https://i.imgur.com/4zN9mBk.png", hint: "Idolo pop dal successo planetario con 'Il principe di Bel-Air', 'Men in Black' e 'Hitch'" },
-        { solution: "robert de niro", url: "https://i.imgur.com/2bC9mKk.png", hint: "Mostro sacro di Hollywood: 'Taxi Driver', 'Toro scatenato' e l'iconico gangster Jimmy Conway" },
-        { solution: "al pacino", url: "https://i.imgur.com/3mK7bXk.png", hint: "Interprete leggendario di Michael Corleone ne 'Il Padrino' e di Tony Montana in 'Scarface'" }
+        { solution: "alberto sordi", file: "Alberto Sordi.webp", hint: "Icona assoluta del cinema romano, celebre per il film 'Il vigile' e 'Il marchese del Grillo'" },
+        { solution: "angelina jolie", file: "Angelina Jolie.webp", hint: "Attrice premio Oscar, ha interpretato Lara Croft in 'Tomb Raider' e 'Maleficent'" },
+        { solution: "arnold schwarzenegger", file: "Arnold Schwarzenegger.webp", hint: "Eroe d'azione e cyborg venuto dal futuro... 'Hasta la vista, baby!' (Terminator)" },
+        { solution: "brad pitt", file: "Brad Pitt.webp", hint: "Sex-symbol mondiale, protagonista in 'Fight Club', 'Troy' e 'Bastardi senza gloria'" },
+        { solution: "johnny depp", file: "Johnny Depp.webp", hint: "Indimenticabile capitano Jack Sparrow in 'Pirati dei Caraibi' ed 'Edward mani di forbice'" },
+        { solution: "leonardo dicaprio", file: "Leonardo DiCaprio.webp", hint: "Sulla prua del 'Titanic' nel 1997, ha vinto il premio Oscar con il film 'Revenant'" },
+        { solution: "gigi proietti", file: "Luigi-Proietti-detto-Gigi.webp", hint: "Il mitico Mandrake in 'Febbre da cavallo' e protagonista de 'Il maresciallo Rocca'" },
+        { solution: "marcello mastroianni", file: "Marcello Mastroianni.webp", hint: "Attore simbolo del cinema italiano, protagonista ne 'La Dolce Vita' di Fellini" },
+        { solution: "marilyn monroe", file: "Marilyn Monroe.webp", hint: "L'icona bionda più famosa di Hollywood, protagonista in 'A qualcuno piace caldo'" },
+        { solution: "monica bellucci", file: "Monica Bellucci.webp", hint: "Diva e modella internazionale, ha recitato in 'Malèna', 'Matrix' e come Bond Girl" },
+        { solution: "checco zalone", file: "Checco Zalone.webp", hint: "Campione d'incassi storico in Italia con 'Cado dalle nubi', 'Sole a catinelle' e 'Quo vado?'" },
+        { solution: "carlo verdone", file: "Carlo Verdone.webp", hint: "Regista e attore comico romano, immortale nei ruoli di Furio, Mimmo e Leo" },
+        { solution: "sophia loren", file: "Sophia Loren.webp", hint: "Leggenda del cinema, premio Oscar per 'La ciociara' e compagna di set di Mastroianni" },
+        { solution: "tom cruise", file: "Tom Cruise.webp", hint: "Il pilota Maverick in 'Top Gun' e l'agente Ethan Hunt nella saga 'Mission: Impossible'" },
+        { solution: "will smith", file: "Will Smith.webp", hint: "Iniziò come 'Il principe di Bel-Air', poi protagonista in 'Men in Black' e 'Io sono Leggenda'" },
+        { solution: "robert de niro", file: "Robert De Niro.webp", hint: "Mostro sacro di Hollywood: 'Taxi Driver', 'Toro scatenato' e il giovane Vito Corleone" },
+        { solution: "al pacino", file: "Al Pacino.webp", hint: "Interprete magistrale di Michael Corleone ne 'Il Padrino' e di Tony Montana in 'Scarface'" }
     ];
 
     let currentLevel = 0;
@@ -185,7 +185,7 @@
         document.getElementById('nextBtn').style.display = 'none';
 
         imgEl.className = "blurred";
-        imgEl.src = playlist[currentLevel].url;
+        imgEl.src = playlist[currentLevel].file;
         hintEl.innerText = `Indizio: ${playlist[currentLevel].hint}`;
     }
 
