@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indovina il Personaggio Misterioso</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #141419;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 30px auto;
+            background: #1f1f2e;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #00adb5;
+        }
+        canvas {
+            background: #000;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            max-width: 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 85%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #2d2d3f;
+            border-radius: 8px;
+            background: #141419;
+            color: #fff;
+            text-align: center;
+            outline: none;
+            transition: border 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #00adb5;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            background: #00adb5;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s, transform 0.1s;
+        }
+        button:hover {
+            background: #008c92;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        #result {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 27px;
+        }
+        .next-btn {
+            background: #28a745;
+            margin-top: 15px;
+            display: none;
+        }
+        .next-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-info">
+        <div id="scoreDisplay">Punti: 0</div>
+        <div id="levelDisplay">Livello: 1/4</div>
+    </div>
+    
+    <h2 style="margin-top: 0;">Chi è il personaggio?</h2>
+    
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    
+    <div class="input-group">
+        <input type="text" id="guessInput" placeholder="Inserisci nome e cognome..." autocomplete="off">
+    </div>
+    
+    <button id="actionBtn" onclick="checkAnswer()">Invia Risposta</button>
+    <button id="nextBtn" class="next-btn" onclick="nextLevel()">Prossimo Livello</button>
+    
+    <div id="result"></div>
+</div>
+
+<script>
+    // Database dei personaggi (Modificabile a piacimento)
+    const playlist = [
+        {
+            solution: "vincent van gogh",
+            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project.jpg/400px-Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project.jpg"
+        },
+        {
+            solution: "albert einstein",
+            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Einstein_1921_by_F_Schmutzer_-_Restoration.jpg/400px-Einstein_1921_by_F_Schmutzer_-_Restoration.jpg"
+        },
+        {
+            solution: "marilyn monroe",
+            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Marilyn_Monroe_in_1952.jpg/400px-Marilyn_Monroe_in_1952.jpg"
+        },
+        {
+            solution: "leonardo da vinci",
+            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Leonardo_da_Vinci_-_Presumed_self-portrait_-_WGA12798.jpg/400px-Leonardo_da_Vinci_-_Presumed_self-portrait_-_WGA12798.jpg"
+        }
+    ];
+
+    let currentLevel = 0;
+    let score = 0;
+    const pixelSize = 35; // Dimensione del mosaico (più alto = più difficile)
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let img = new Image();
+
+    // Gestione input con tasto Invio
+    document.getElementById('guessInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            if (document.getElementById('actionBtn').style.display !== 'none') {
+                checkAnswer();
+            } else if (document.getElementById('nextBtn').style.display === 'inline-block') {
+                nextLevel();
+            }
+        }
+    });
+
+    // Avvio del gioco
+    loadLevel();
+
+    function loadLevel() {
+        // Aggiorna interfacce numeriche
+        document.getElementById('levelDisplay').innerText = `Livello: ${currentLevel + 1}/${playlist.length}`;
+        document.getElementById('scoreDisplay').innerText = `Punti: ${score}`;
+        
+        // Reset elementi UI
+        document.getElementById('guessInput').value = '';
+        document.getElementById('guessInput').disabled = false;
+        document.getElementById('result').innerHTML = '';
+        document.getElementById('actionBtn').style.display = 'inline-block';
+        document.getElementById('nextBtn').style.display = 'none';
+
+        // Caricamento Immagine
+        img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.src = playlist[currentLevel].url;
+        img.onload = function() {
+            drawMosaic();
+        };
+    }
+
+    function drawMosaic() {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        for (let y = 0; y < canvas.height; y += pixelSize) {
+            for (let x = 0; x < canvas.width; x += pixelSize) {
+                const pixelData = ctx.getImageData(x + pixelSize/2, y + pixelSize/2, 1, 1).data;
+                ctx.fillStyle = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
+                ctx.fillRect(x, y, pixelSize, pixelSize);
+            }
+        }
+    }
+
+    function revealIdentity() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    }
+
+    function checkAnswer() {
+        const userInput = document.getElementById('guessInput').value.trim().toLowerCase();
+        const currentSolution = playlist[currentLevel].solution;
+        const resultDiv = document.getElementById('result');
+
+        if (!userInput) return; // Evita l'invio vuoto
+
+        revealIdentity();
+        document.getElementById('guessInput').disabled = true;
+        document.getElementById('actionBtn').style.display = 'none';
+
+        if (userInput === currentSolution) {
+            score += 10;
+            document.getElementById('scoreDisplay').innerText = `Punti: ${score}`;
+            resultDiv.innerHTML = "<span style='color: #4edf7a;'>Risposta Esatta! +10 Punti</span>";
+        } else {
+            resultDiv.innerHTML = `<span style='color: #ff4d4d;'>Sbagliato! Era: ${currentSolution.toUpperCase()}</span>`;
+        }
+
+        document.getElementById('nextBtn').style.display = 'inline-block';
+    }
+
+    function nextLevel() {
+        currentLevel++;
+        if (currentLevel < playlist.length) {
+            loadLevel();
+        } else {
+            // Fine del gioco
+            document.getElementById('guessInput').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('result').innerHTML = `<span style='color: #00adb5; font-size: 22px;'>Gioco Terminato!<br>Punteggio Finale: ${score}/${playlist.length * 10}</span>`;
+        }
+    }
+</script>
+
+</body>
+</html>
