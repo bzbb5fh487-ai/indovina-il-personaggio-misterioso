@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Cinema - 17 Personaggi Reali</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0b0b0e;
+            color: #ffffff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 440px;
+            margin: 10px auto;
+            background: #16161f;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.8);
+        }
+        .status {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            color: #00adb5;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #imageContainer {
+            width: 320px;
+            height: 320px;
+            margin: 0 auto 15px auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            border: 2px solid #282837;
+            background: #000;
+        }
+        #actorImage {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: filter 0.4s ease-in-out;
+        }
+        .blurred {
+            filter: blur(20px) contrast(1.15) brightness(0.95);
+        }
+        .sharp {
+            filter: blur(0px) contrast(1) brightness(1);
+        }
+        .hint-box {
+            font-size: 14px;
+            color: #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: inline-block;
+            max-width: 90%;
+            font-style: italic;
+            border: 1px solid rgba(255, 204, 0, 0.2);
+        }
+        input[type="text"] {
+            width: 88%;
+            padding: 14px;
+            font-size: 16px;
+            border: 2px solid #2d2d3f;
+            border-radius: 12px;
+            background: #0b0b0e;
+            color: #fff;
+            text-align: center;
+            outline: none;
+            margin-bottom: 15px;
+            transition: border 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #00adb5;
+        }
+        button {
+            padding: 14px;
+            font-size: 16px;
+            background: #00adb5;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 95%;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #008c92;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 50px;
+            line-height: 1.4;
+        }
+        .next-btn {
+            background: #28a745;
+            display: none;
+        }
+        .next-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="status">
+        <div id="levelDisplay">Attore: 1/17</div>
+        <div id="scoreDisplay">Punti: 0</div>
+    </div>
+    
+    <h3 style="margin-top: 0; color: #f3f3f3; font-size: 18px; font-weight: 500;">Chi si nasconde dietro la sfocatura?</h3>
+    
+    <div id="imageContainer">
+        <img id="actorImage" class="blurred" src="" alt="Attore Misterioso">
+    </div>
+
+    <div id="hintDisplay" class="hint-box">Caricamento indizio...</div>
+    
+    <input type="text" id="guessInput" placeholder="Nome e Cognome..." autocomplete="off">
+    <br>
+    <button id="actionBtn" onclick="checkAnswer()">Invia Risposta</button>
+    <button id="nextBtn" class="next-btn" onclick="nextLevel()">Prossimo Personaggio</button>
+    
+    <div id="result"></div>
+</div>
+
+<script>
+    const playlist = [
+        { solution: "alberto sordi", file: "Alberto Sordi.webp", hint: "Icona assoluta del cinema romano, celebre per il film 'Il vigile' e 'Il marchese del Grillo'" },
+        { solution: "angelina jolie", file: "Angelina Jolie.webp", hint: "Attrice premio Oscar, ha interpretato Lara Croft in 'Tomb Raider' e 'Maleficent'" },
+        { solution: "arnold schwarzenegger", file: "Arnold Schwarzenegger.webp", hint: "Eroe d'azione e cyborg venuto dal futuro... 'Hasta la vista, baby!' (Terminator)" },
+        { solution: "brad pitt", file: "Brad Pitt.webp", hint: "Sex-symbol mondiale, protagonista in 'Fight Club', 'Troy' e 'Bastardi senza gloria'" },
+        { solution: "johnny depp", file: "Johnny Depp.webp", hint: "Indimenticabile capitano Jack Sparrow in 'Pirati dei Caraibi' ed 'Edward mani di forbice'" },
+        { solution: "leonardo dicaprio", file: "Leonardo DiCaprio.webp", hint: "Sulla prua del 'Titanic' nel 1997, ha vinto il premio Oscar con il film 'Revenant'" },
+        { solution: "gigi proietti", file: "Luigi-Proietti-detto-Gigi.webp", hint: "Il mitico Mandrake in 'Febbre da cavallo' e protagonista de 'Il maresciallo Rocca'" },
+        { solution: "marcello mastroianni", file: "Marcello Mastroianni.webp", hint: "Attore simbolo del cinema italiano, protagonista ne 'La Dolce Vita' di Fellini" },
+        { solution: "marilyn monroe", file: "Marilyn Monroe.webp", hint: "L'icona bionda più famosa di Hollywood, protagonista in 'A qualcuno piace caldo'" },
+        { solution: "monica bellucci", file: "Monica Bellucci.webp", hint: "Diva e modella internazionale, ha recitato in 'Malèna', 'Matrix' e come Bond Girl" },
+        { solution: "checco zalone", file: "Checco Zalone.webp", hint: "Campione d'incassi storico in Italia con 'Cado dalle nubi', 'Sole a catinelle' e 'Quo vado?'" },
+        { solution: "carlo verdone", file: "Carlo Verdone.webp", hint: "Regista e attore comico romano, immortale nei ruoli di Furio, Mimmo e Leo" },
+        { solution: "sophia loren", file: "Sophia Loren.webp", hint: "Leggenda del cinema, premio Oscar per 'La ciociara' e compagna di set di Mastroianni" },
+        { solution: "tom cruise", file: "Tom Cruise.webp", hint: "Il pilota Maverick in 'Top Gun' e l'agente Ethan Hunt nella saga 'Mission: Impossible'" },
+        { solution: "will smith", file: "Will Smith.webp", hint: "Iniziò come 'Il principe di Bel-Air', poi protagonista in 'Men in Black' e 'Io sono Leggenda'" },
+        { solution: "robert de niro", file: "Robert De Niro.webp", hint: "Mostro sacro di Hollywood: 'Taxi Driver', 'Toro scatenato' e il giovane Vito Corleone" },
+        { solution: "al pacino", file: "Al Pacino.webp", hint: "Interprete magistrale di Michael Corleone ne 'Il Padrino' e di Tony Montana in 'Scarface'" }
+    ];
+
+    let currentLevel = 0;
+    let score = 0;
+    const imgEl = document.getElementById('actorImage');
+    const hintEl = document.getElementById('hintDisplay');
+
+    document.getElementById('guessInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            if (document.getElementById('actionBtn').style.display !== 'none') {
+                checkAnswer();
+            } else if (document.getElementById('nextBtn').style.display === 'block') {
+                nextLevel();
+            }
+        }
+    });
+
+    loadLevel();
+
+    function loadLevel() {
+        document.getElementById('levelDisplay').innerText = `Attore: ${currentLevel + 1}/${playlist.length}`;
+        document.getElementById('scoreDisplay').innerText = `Punti: ${score}`;
+        document.getElementById('guessInput').value = '';
+        document.getElementById('guessInput').disabled = false;
+        document.getElementById('result').innerHTML = '';
+        document.getElementById('actionBtn').style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'none';
+
+        imgEl.className = "blurred";
+        imgEl.src = playlist[currentLevel].file;
+        hintEl.innerText = `Indizio: ${playlist[currentLevel].hint}`;
+    }
+
+    function checkAnswer() {
+        const userInput = document.getElementById('guessInput').value.trim().toLowerCase();
+        const currentSolution = playlist[currentLevel].solution;
+        const resultDiv = document.getElementById('result');
+
+        if (!userInput) return;
+
+        imgEl.className = "sharp";
+
+        document.getElementById('guessInput').disabled = true;
+        document.getElementById('actionBtn').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'block';
+
+        if (userInput === currentSolution || 
+           (currentSolution === "gigi proietti" && (userInput.includes("proietti") || userInput === "gigi")) ||
+           (currentSolution === "checco zalone" && userInput.includes("zalone")) ||
+           (currentSolution === "carlo verdone" && userInput.includes("verdone")) ||
+           (currentSolution === "sophia loren" && userInput.includes("loren"))) {
+            score += 10;
+            document.getElementById('scoreDisplay').innerText = `Punti: ${score}`;
+            resultDiv.innerHTML = "<span style='color: #4edf7a; font-size: 20px;'>Indovinato! +10 Punti</span>";
+        } else {
+            resultDiv.innerHTML = `<span style='color: #ff4d4d;'>Sbagliato!<br><span style='font-size:14px; color:#aaa;'>La risposta corretta era:</span> <span style='font-size:20px;'>${currentSolution.toUpperCase()}</span></span>`;
+        }
+    }
+
+    function nextLevel() {
+        currentLevel++;
+        if (currentLevel < playlist.length) {
+            loadLevel();
+        } else {
+            document.getElementById('guessInput').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            hintEl.style.display = 'none';
+            document.getElementById('result').innerHTML = `<span style='color: #00adb5; font-size: 22px;'>🎬 Quiz Completato!<br>Punteggio Finale: ${score}/${playlist.length * 10}</span>`;
+        }
+    }
+</script>
+
+</body>
+</html>
