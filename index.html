@@ -3,82 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indovina il Personaggio Misterioso</title>
+    <title>Quiz Cinema - 17 Personaggi</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #141419;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0b0b0e;
             color: #ffffff;
             text-align: center;
-            padding: 20px;
             margin: 0;
+            padding: 20px;
         }
         .container {
-            max-width: 500px;
-            margin: 30px auto;
-            background: #1f1f2e;
+            max-width: 440px;
+            margin: 10px auto;
+            background: #16161f;
             padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.8);
         }
-        .header-info {
+        .status {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
-            font-weight: bold;
+            font-weight: 700;
             color: #00adb5;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        canvas {
+        #imageContainer {
+            width: 320px;
+            height: 320px;
+            margin: 0 auto 15px auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            border: 2px solid #282837;
             background: #000;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            max-width: 100%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-        .input-group {
+        #actorImage {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: filter 0.4s ease-in-out;
+        }
+        .blurred {
+            filter: blur(22px) contrast(1.15) brightness(0.95);
+        }
+        .sharp {
+            filter: blur(0px) contrast(1) brightness(1);
+        }
+        .hint-box {
+            font-size: 14px;
+            color: #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+            padding: 10px 14px;
+            border-radius: 10px;
             margin-bottom: 20px;
+            display: inline-block;
+            max-width: 90%;
+            font-style: italic;
+            border: 1px solid rgba(255, 204, 0, 0.2);
         }
         input[type="text"] {
-            width: 85%;
-            padding: 12px;
+            width: 88%;
+            padding: 14px;
             font-size: 16px;
             border: 2px solid #2d2d3f;
-            border-radius: 8px;
-            background: #141419;
+            border-radius: 12px;
+            background: #0b0b0e;
             color: #fff;
             text-align: center;
             outline: none;
+            margin-bottom: 15px;
             transition: border 0.3s;
         }
         input[type="text"]:focus {
             border-color: #00adb5;
         }
         button {
-            padding: 12px 25px;
+            padding: 14px;
             font-size: 16px;
             background: #00adb5;
             color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: bold;
-            transition: background 0.2s, transform 0.1s;
+            width: 95%;
+            transition: background 0.2s;
         }
         button:hover {
             background: #008c92;
         }
-        button:active {
-            transform: scale(0.98);
-        }
         #result {
-            margin-top: 15px;
+            margin-top: 20px;
             font-size: 18px;
             font-weight: bold;
-            min-height: 27px;
+            min-height: 50px;
+            line-height: 1.4;
         }
         .next-btn {
             background: #28a745;
-            margin-top: 15px;
             display: none;
         }
         .next-btn:hover {
@@ -89,103 +116,77 @@
 <body>
 
 <div class="container">
-    <div class="header-info">
+    <div class="status">
+        <div id="levelDisplay">Attore: 1/17</div>
         <div id="scoreDisplay">Punti: 0</div>
-        <div id="levelDisplay">Livello: 1/4</div>
     </div>
     
-    <h2 style="margin-top: 0;">Chi è il personaggio?</h2>
+    <h3 style="margin-top: 0; color: #f3f3f3; font-size: 18px; font-weight: 500;">Chi si nasconde dietro la sfocatura?</h3>
     
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    
-    <div class="input-group">
-        <input type="text" id="guessInput" placeholder="Inserisci nome e cognome..." autocomplete="off">
+    <div id="imageContainer">
+        <img id="actorImage" class="blurred" src="" alt="Attore Misterioso">
     </div>
+
+    <div id="hintDisplay" class="hint-box">Caricamento indizio...</div>
     
+    <input type="text" id="guessInput" placeholder="Nome e Cognome..." autocomplete="off">
+    <br>
     <button id="actionBtn" onclick="checkAnswer()">Invia Risposta</button>
-    <button id="nextBtn" class="next-btn" onclick="nextLevel()">Prossimo Livello</button>
+    <button id="nextBtn" class="next-btn" onclick="nextLevel()">Prossimo Personaggio</button>
     
     <div id="result"></div>
 </div>
 
 <script>
-    // Database dei personaggi (Modificabile a piacimento)
     const playlist = [
-        {
-            solution: "vincent van gogh",
-            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project.jpg/400px-Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project.jpg"
-        },
-        {
-            solution: "albert einstein",
-            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Einstein_1921_by_F_Schmutzer_-_Restoration.jpg/400px-Einstein_1921_by_F_Schmutzer_-_Restoration.jpg"
-        },
-        {
-            solution: "marilyn monroe",
-            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Marilyn_Monroe_in_1952.jpg/400px-Marilyn_Monroe_in_1952.jpg"
-        },
-        {
-            solution: "leonardo da vinci",
-            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Leonardo_da_Vinci_-_Presumed_self-portrait_-_WGA12798.jpg/400px-Leonardo_da_Vinci_-_Presumed_self-portrait_-_WGA12798.jpg"
-        }
+        { solution: "alberto sordi", url: "https://i.imgur.com/GzB0u6R.png", hint: "Icona del cinema italiano, indimenticabile nei ruoli del Vigile e del Marchese del Grillo" },
+        { solution: "angelina jolie", url: "https://i.imgur.com/vHq0LzN.png", hint: "Attrice premio Oscar, volto di Lara Croft in 'Tomb Raider' e della spietata 'Maleficent'" },
+        { solution: "arnold schwarzenegger", url: "https://i.imgur.com/9nJ97oG.png", hint: "Campione di bodybuilding ed eroe d'azione... 'Hasta la vista, baby!' (Terminator)" },
+        { solution: "brad pitt", url: "https://i.imgur.com/w9Z3mXN.png", hint: "Star mondiale, protagonista in cult assoluti come 'Fight Club', 'Troy' e 'Se7en'" },
+        { solution: "johnny depp", url: "https://i.imgur.com/f0mX84e.png", hint: "Camaleontico interprete di Jack Sparrow in 'Pirati dei Caraibi' ed 'Edward mani di forbice'" },
+        { solution: "leonardo dicaprio", url: "https://i.imgur.com/V7IscR6.png", hint: "Ha raggiunto la fama mondiale con 'Titanic', vincendo l'Oscar grazie a 'The Revenant'" },
+        { solution: "gigi proietti", url: "https://i.imgur.com/9Cby8L0.png", hint: "Il mitico Mandrake in 'Febbre da cavallo' e protagonista assoluto ne 'Il maresciallo Rocca'" },
+        { solution: "marcello mastroianni", url: "https://i.imgur.com/E0X7o7b.png", hint: "Simbolo del cinema italiano e compagno di set della Loren in capolavori come 'La Dolce Vita'" },
+        { solution: "marilyn monroe", url: "https://i.imgur.com/6Dbtm5x.png", hint: "L'icona bionda più celebre del XX secolo, protagonista in 'A qualcuno piace caldo'" },
+        { solution: "monica bellucci", url: "https://i.imgur.com/N6E3yX3.png", hint: "Diva e modella dal fascino mediterraneo, interprete in 'Malèna' e nella saga di 'Matrix'" },
+        { solution: "checco zalone", url: "https://i.imgur.com/3fK9XmZ.png", hint: "Re assoluto del box office comico italiano con 'Cado dalle nubi' e 'Quo vado?'" },
+        { solution: "carlo verdone", url: "https://i.imgur.com/6Xz9bWk.png", hint: "Pilastro della commedia romana, indimenticabile nei ruoli di Furio, Mimmo e Ivano" },
+        { solution: "sophia loren", url: "https://i.imgur.com/9vB2nK8.png", hint: "Leggenda vivente del grande schermo, ha vinto il premio Oscar per 'La ciociara'" },
+        { solution: "tom cruise", url: "https://i.imgur.com/8mB7bXk.png", hint: "Spericolato pilota Maverick in 'Top Gun' ed agente segreto nella saga 'Mission: Impossible'" },
+        { solution: "will smith", url: "https://i.imgur.com/4zN9mBk.png", hint: "Idolo pop dal successo planetario con 'Il principe di Bel-Air', 'Men in Black' e 'Hitch'" },
+        { solution: "robert de niro", url: "https://i.imgur.com/2bC9mKk.png", hint: "Mostro sacro di Hollywood: 'Taxi Driver', 'Toro scatenato' e l'iconico gangster Jimmy Conway" },
+        { solution: "al pacino", url: "https://i.imgur.com/3mK7bXk.png", hint: "Interprete leggendario di Michael Corleone ne 'Il Padrino' e di Tony Montana in 'Scarface'" }
     ];
 
     let currentLevel = 0;
     let score = 0;
-    const pixelSize = 35; // Dimensione del mosaico (più alto = più difficile)
+    const imgEl = document.getElementById('actorImage');
+    const hintEl = document.getElementById('hintDisplay');
 
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    let img = new Image();
-
-    // Gestione input con tasto Invio
     document.getElementById('guessInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             if (document.getElementById('actionBtn').style.display !== 'none') {
                 checkAnswer();
-            } else if (document.getElementById('nextBtn').style.display === 'inline-block') {
+            } else if (document.getElementById('nextBtn').style.display === 'block') {
                 nextLevel();
             }
         }
     });
 
-    // Avvio del gioco
     loadLevel();
 
     function loadLevel() {
-        // Aggiorna interfacce numeriche
-        document.getElementById('levelDisplay').innerText = `Livello: ${currentLevel + 1}/${playlist.length}`;
+        document.getElementById('levelDisplay').innerText = `Attore: ${currentLevel + 1}/${playlist.length}`;
         document.getElementById('scoreDisplay').innerText = `Punti: ${score}`;
-        
-        // Reset elementi UI
         document.getElementById('guessInput').value = '';
         document.getElementById('guessInput').disabled = false;
         document.getElementById('result').innerHTML = '';
-        document.getElementById('actionBtn').style.display = 'inline-block';
+        document.getElementById('actionBtn').style.display = 'block';
         document.getElementById('nextBtn').style.display = 'none';
 
-        // Caricamento Immagine
-        img = new Image();
-        img.crossOrigin = "Anonymous";
-        img.src = playlist[currentLevel].url;
-        img.onload = function() {
-            drawMosaic();
-        };
-    }
-
-    function drawMosaic() {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        for (let y = 0; y < canvas.height; y += pixelSize) {
-            for (let x = 0; x < canvas.width; x += pixelSize) {
-                const pixelData = ctx.getImageData(x + pixelSize/2, y + pixelSize/2, 1, 1).data;
-                ctx.fillStyle = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
-                ctx.fillRect(x, y, pixelSize, pixelSize);
-            }
-        }
-    }
-
-    function revealIdentity() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        imgEl.className = "blurred";
+        imgEl.src = playlist[currentLevel].url;
+        hintEl.innerText = `Indizio: ${playlist[currentLevel].hint}`;
     }
 
     function checkAnswer() {
@@ -193,21 +194,25 @@
         const currentSolution = playlist[currentLevel].solution;
         const resultDiv = document.getElementById('result');
 
-        if (!userInput) return; // Evita l'invio vuoto
+        if (!userInput) return;
 
-        revealIdentity();
+        imgEl.className = "sharp";
+
         document.getElementById('guessInput').disabled = true;
         document.getElementById('actionBtn').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'block';
 
-        if (userInput === currentSolution) {
+        if (userInput === currentSolution || 
+           (currentSolution === "gigi proietti" && (userInput.includes("proietti") || userInput === "gigi")) ||
+           (currentSolution === "checco zalone" && userInput.includes("zalone")) ||
+           (currentSolution === "carlo verdone" && userInput.includes("verdone")) ||
+           (currentSolution === "sophia loren" && userInput.includes("loren"))) {
             score += 10;
             document.getElementById('scoreDisplay').innerText = `Punti: ${score}`;
-            resultDiv.innerHTML = "<span style='color: #4edf7a;'>Risposta Esatta! +10 Punti</span>";
+            resultDiv.innerHTML = "<span style='color: #4edf7a; font-size: 20px;'>Indovinato! +10 Punti</span>";
         } else {
-            resultDiv.innerHTML = `<span style='color: #ff4d4d;'>Sbagliato! Era: ${currentSolution.toUpperCase()}</span>`;
+            resultDiv.innerHTML = `<span style='color: #ff4d4d;'>Sbagliato!<br><span style='font-size:14px; color:#aaa;'>La risposta corretta era:</span> <span style='font-size:20px;'>${currentSolution.toUpperCase()}</span></span>`;
         }
-
-        document.getElementById('nextBtn').style.display = 'inline-block';
     }
 
     function nextLevel() {
@@ -215,10 +220,10 @@
         if (currentLevel < playlist.length) {
             loadLevel();
         } else {
-            // Fine del gioco
             document.getElementById('guessInput').style.display = 'none';
             document.getElementById('nextBtn').style.display = 'none';
-            document.getElementById('result').innerHTML = `<span style='color: #00adb5; font-size: 22px;'>Gioco Terminato!<br>Punteggio Finale: ${score}/${playlist.length * 10}</span>`;
+            hintEl.style.display = 'none';
+            document.getElementById('result').innerHTML = `<span style='color: #00adb5; font-size: 22px;'>🎬 Quiz Completato!<br>Punteggio Finale: ${score}/${playlist.length * 10}</span>`;
         }
     }
 </script>
